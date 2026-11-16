@@ -1,0 +1,1440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Electronic Card </title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    font-family: Georgia, serif;
+    background: radial-gradient(ellipse at center, #e8d3ad, #b99a70);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+/* FLOATING HEARTS */
+
+.background-hearts {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
+}
+
+.floating-heart {
+    position: absolute;
+    bottom: -50px;
+    color: rgba(255, 244, 222, 0.7);
+    animation: floatUp linear infinite;
+}
+
+@keyframes floatUp {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 0;
+    }
+    20% { opacity: 1; }
+    100% {
+        transform: translateY(-115vh) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* ENVELOPE LANDING PAGE */
+
+.envelope-screen {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 28px;
+    background: radial-gradient(ellipse at center, #f3e5cb, #b99a70);
+    z-index: 50;
+    transition: opacity 0.6s ease, visibility 0.6s ease;
+}
+
+.envelope-screen.opened {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.envelope-heading {
+    color: #795536;
+    font-family: Georgia, serif;
+    font-size: clamp(38px, 6vw, 58px);
+    text-align: center;
+    padding: 0 15px;
+}
+
+.envelope-hint {
+    color: #80684f;
+    font-size: 14px;
+    text-align: center;
+}
+
+/* MEDIUM-LARGE ENVELOPE */
+
+.envelope-button {
+    position: relative;
+    width: min(86vw, 400px);
+    height: 260px;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    box-shadow: 0 22px 35px rgba(70, 45, 20, 0.25);
+    overflow: visible;
+    cursor: pointer;
+    perspective: 900px;
+}
+
+.envelope-back {
+    position: absolute;
+    inset: 0;
+    background: #d8bd94;
+    border: 2px solid #a98458;
+    border-radius: 8px;
+}
+
+.envelope-letter {
+    position: absolute;
+    left: 8%;
+    top: 8%;
+    width: 84%;
+    height: 82%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    background: #fff8e9;
+    color: #95663f;
+    border: 1px solid #d8bd94;
+    border-radius: 4px;
+    font-family: Georgia, serif;
+    font-size: 30px;
+    transition: transform 0.8s ease 0.2s;
+}
+
+.envelope-letter span {
+    font-family: Georgia, serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+}
+
+.envelope-front {
+    position: absolute;
+    inset: 0;
+    background: #c9a77c;
+    clip-path: polygon(0 0, 50% 58%, 100% 0, 100% 100%, 0 100%);
+    border-radius: 8px;
+    z-index: 2;
+}
+
+.envelope-flap {
+    position: absolute;
+    inset: 0;
+    background: #e4cba5;
+    clip-path: polygon(0 0, 100% 0, 50% 62%);
+    transform-origin: top center;
+    transition: transform 0.7s ease;
+    z-index: 3;
+}
+
+.envelope-seal {
+    position: absolute;
+    z-index: 4;
+    left: 50%;
+    top: 57%;
+    transform: translate(-50%, -50%);
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: #9d5c50;
+    color: #fff4e4;
+    font-size: 25px;
+    box-shadow: 0 3px 8px rgba(70, 35, 25, 0.25);
+    transition: opacity 0.3s ease;
+}
+
+.envelope-button:hover {
+    transform: translateY(-5px);
+}
+
+.envelope-button.opening .envelope-flap {
+    transform: rotateX(180deg);
+    z-index: 1;
+}
+
+.envelope-button.opening .envelope-letter {
+    transform: translateY(-135px);
+}
+
+.envelope-button.opening .envelope-seal {
+    opacity: 0;
+}
+
+#letter, #questionBox {
+    display: none;
+}
+
+/* ENLARGED WARNING SCREEN */
+
+.warning-screen {
+    display: none;
+    position: fixed;
+    inset: 0;
+    justify-content: center;
+    align-items: center;
+    padding: 28px;
+    overflow-y: auto;
+    background: radial-gradient(ellipse at center, #e8d3ad, #b99a70);
+    z-index: 40;
+}
+
+.warning-box {
+    width: 100%;
+    max-width: 700px;
+    padding: 60px 50px;
+    text-align: center;
+    background: #fffaf0;
+    border: 4px double #c6a77f;
+    border-radius: 28px;
+    box-shadow: 0 18px 48px rgba(80, 55, 30, 0.28);
+    animation: gameAppear 0.6s ease;
+}
+
+.warning-icon {
+    font-size: 68px;
+    margin-bottom: 22px;
+}
+
+.warning-box h1 {
+    color: #95663f;
+    font-family: Georgia, serif;
+    font-size: clamp(36px, 5vw, 48px);
+    font-weight: 700;
+    margin-bottom: 24px;
+}
+
+.warning-box p {
+    color: #765b40;
+    font-size: clamp(18px, 2.5vw, 22px);
+    line-height: 1.9;
+    margin-bottom: 32px;
+}
+
+.continue-button {
+    min-width: 190px;
+    padding: 16px 36px;
+    font-size: 18px;
+    background: linear-gradient(135deg, #b68b62, #8e6040);
+    color: white;
+    box-shadow: 0 5px 15px rgba(150, 102, 63, 0.25);
+}
+
+.continue-button:hover {
+    transform: translateY(-3px) scale(1.04);
+}
+
+/* VINTAGE LOVE LETTER */
+
+.letter {
+    position: relative;
+    width: 90%;
+    max-width: 680px;
+    min-height: 530px;
+    padding: 45px;
+    background:
+        linear-gradient(120deg,
+        rgba(255,255,255,0.2),
+        transparent 40%,
+        rgba(139,91,48,0.12)),
+        #ead9b8;
+    border: 12px solid #d0b68e;
+    outline: 2px solid #94744e;
+    outline-offset: -17px;
+    border-radius: 3px;
+    box-shadow: 0 20px 50px rgba(48,32,17,0.35);
+    text-align: center;
+    z-index: 1;
+}
+
+.letter::before,
+.letter::after {
+    content: "❀";
+    position: absolute;
+    color: #98754e;
+    font-size: 45px;
+    opacity: 0.65;
+}
+
+.letter::before {
+    top: 12px;
+    left: 18px;
+}
+
+.letter::after {
+    bottom: 12px;
+    right: 18px;
+}
+
+.top-decoration {
+    color: #98754e;
+    font-size: 25px;
+    letter-spacing: 8px;
+    margin-bottom: 20px;
+}
+
+.letter h1 {
+    font-family: Georgia, serif;
+    font-size: 55px;
+    color: #795536;
+    margin-bottom: 25px;
+}
+
+.letter p {
+    color: #765b40;
+    line-height: 2;
+    font-size: 15px;
+}
+
+.letter-divider {
+    margin: 25px auto;
+    color: #98754e;
+    font-size: 24px;
+}
+
+.signature {
+    font-family: Georgia, serif;
+    font-size: 32px;
+    color: #795536;
+    text-align: right;
+    margin-top: 20px;
+}
+
+.bottom-decoration {
+    color: #98754e;
+    margin-top: 20px;
+    letter-spacing: 8px;
+}
+
+/* FIRST QUESTION CARD */
+
+.question-box {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 85%;
+    max-width: 390px;
+    padding: 35px 25px;
+    background: #fffaf0;
+    border: 2px solid #dfc39b;
+    border-radius: 25px;
+    text-align: center;
+    box-shadow: 0 15px 45px rgba(86, 58, 32, 0.25);
+    z-index: 5;
+    animation: appear 1s ease;
+}
+
+@keyframes appear {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -40%);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+}
+
+.question-heart {
+    width: 85px;
+    height: 85px;
+    margin: 0 auto 15px;
+    background: #f2e3cc;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 45px;
+    animation: heartbeat 1.5s infinite;
+}
+
+/* YOUR PHOTO ON THE FIRST PAGE */
+
+.my-picture {
+    display: block;
+    width: 130px;
+    height: 150px;
+    object-fit: cover;
+    object-position: center;
+    margin: 0 auto 15px;
+    border: 4px solid #dfc39b;
+    border-radius: 18px;
+    box-shadow: 0 5px 15px rgba(86, 58, 32, 0.2);
+}
+
+@keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.12); }
+}
+
+.question-box h2 {
+    font-family: Georgia, serif;
+    font-size: 43px;
+    color: #95663f;
+    margin-bottom: 8px;
+}
+
+.question-box p {
+    color: #a18568;
+    font-size: 13px;
+    margin-bottom: 25px;
+}
+
+.buttons {
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    min-height: 48px;
+}
+
+button {
+    padding: 12px 28px;
+    border: none;
+    border-radius: 30px;
+    font-family: Georgia, serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.25s ease;
+}
+
+#yesBtn {
+    background: linear-gradient(135deg, #b68b62, #8e6040);
+    color: white;
+    box-shadow: 0 5px 15px #d9c0a1;
+}
+
+#yesBtn:hover {
+    transform: scale(1.12);
+}
+
+#noBtn {
+    background: #e8ddcc;
+    color: #80684f;
+    position: relative;
+}
+
+#noBtn:hover {
+    background: #ddcbb1;
+}
+
+.card-footer {
+    margin-top: 25px;
+    font-size: 20px;
+    color: #b18b64;
+    letter-spacing: 5px;
+}
+
+/* SECOND PAGE: HANDSOME GAME */
+
+.next-page {
+    display: none;
+    position: fixed;
+    inset: 0;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    overflow-y: auto;
+    background: radial-gradient(ellipse at center, #e8d3ad, #b99a70);
+    z-index: 10;
+}
+
+.game-content {
+    width: 100%;
+    max-width: 850px;
+    background: #fffaf0;
+    border: 3px double #c6a77f;
+    border-radius: 25px;
+    padding: 35px 30px;
+    text-align: center;
+    box-shadow: 0 15px 40px rgba(80, 55, 30, 0.2);
+    animation: gameAppear 0.8s ease;
+}
+
+@keyframes gameAppear {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.game-intro {
+    font-size: 18px;
+    color: #a17b54;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.game-content h1 {
+    font-family: Georgia, serif;
+    color: #95663f;
+    font-size: 48px;
+    margin-bottom: 10px;
+}
+
+.game-instruction {
+    color: #a18568;
+    font-size: 13px;
+    margin-bottom: 25px;
+}
+
+/* TWO PHOTO OPTIONS */
+
+.people-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+    max-width: 650px;
+    margin: 0 auto;
+}
+
+.person-card {
+    position: relative;
+    width: 100%;
+    padding: 12px;
+    background: #fff;
+    border: 2px solid #dfc39b;
+    border-radius: 18px;
+    color: #795536;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 8px 20px rgba(86, 58, 32, 0.15);
+    cursor: pointer;
+}
+
+.person-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 25px rgba(86, 58, 32, 0.22);
+}
+
+.person-card img {
+    display: block;
+    width: 100%;
+    height: 230px;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 12px;
+    background: #ead9b8;
+}
+
+.person-name {
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.choose-text {
+    color: #a18568;
+    font-size: 12px;
+    font-weight: 400;
+}
+
+#joshuaCard.running {
+    position: fixed;
+    z-index: 15;
+    transition: left 0.35s ease, top 0.35s ease;
+}
+
+.game-status {
+    min-height: 25px;
+    margin-top: 22px;
+    color: #95663f;
+    font-size: 13px;
+}
+
+/* THIRD PAGE: ME VS PIOLO AND FINAL ANSWER */
+
+.result-page {
+    display: none;
+    position: fixed;
+    inset: 0;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    overflow-y: auto;
+    background: radial-gradient(ellipse at center, #e8d3ad, #b99a70);
+    z-index: 20;
+}
+
+#secondQuestion {
+    max-width: 700px;
+    padding: 35px 25px;
+}
+
+#secondQuestion .people-options {
+    margin-top: 25px;
+}
+
+#secondQuestion .person-card {
+    transition: 0.3s ease;
+}
+
+#secondQuestion .person-card:hover {
+    transform: translateY(-8px) scale(1.03);
+}
+
+/* PIOLO'S CARD MOVES AROUND WHEN SELECTED */
+
+#pioloCard.running {
+    position: fixed;
+    z-index: 30;
+    margin: 0;
+    transition: left 0.3s ease, top 0.3s ease;
+}
+
+.result-content {
+    width: 100%;
+    max-width: 450px;
+    background: #fffaf0;
+    border: 3px double #c6a77f;
+    border-radius: 20px;
+    padding: 50px 25px;
+    text-align: center;
+    box-shadow: 0 15px 40px rgba(80, 55, 30, 0.2);
+    animation: gameAppear 0.8s ease;
+}
+
+.result-content .big-heart {
+    font-size: 70px;
+    margin-bottom: 15px;
+}
+
+.result-content h1 {
+    font-family: Georgia, serif;
+    color: #95663f;
+    font-size: 45px;
+    margin-bottom: 15px;
+}
+
+.result-content p {
+    color: #936c50;
+    line-height: 1.8;
+}
+
+/* GRADE QUESTION */
+
+.grade-options {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    max-width: 300px;
+    margin: 25px auto 10px;
+}
+
+.grade-button {
+    background: linear-gradient(135deg, #b68b62, #8e6040);
+    color: #fff;
+    font-size: 20px;
+    padding: 15px 20px;
+    border: 2px solid #dfc39b;
+    box-shadow: 0 5px 15px rgba(150, 102, 63, 0.2);
+}
+
+.grade-button:hover {
+    transform: translateY(-3px) scale(1.04);
+}
+
+.grade-status {
+    min-height: 42px;
+    margin-top: 18px;
+    color: #95663f;
+    font-size: 13px;
+}
+
+/* FINAL LOVE LETTER PAGE */
+
+.love-letter-page {
+    display: none;
+    position: fixed;
+    inset: 0;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    overflow-y: auto;
+    background: radial-gradient(ellipse at center, #e8d3ad, #b99a70);
+    z-index: 60;
+}
+
+.love-letter-page .letter {
+    margin: auto;
+    animation: gameAppear 0.8s ease;
+}
+
+.letter-message {
+    white-space: pre-line;
+    text-align: center;
+    font-size: 17px;
+}
+
+/* MOBILE RESPONSIVE */
+
+@media(max-width: 600px) {
+    .warning-screen {
+        padding: 16px;
+    }
+
+    .warning-box {
+        padding: 38px 22px;
+        border-radius: 22px;
+    }
+
+    .warning-icon {
+        font-size: 54px;
+        margin-bottom: 16px;
+    }
+
+    .warning-box h1 {
+        font-size: 34px;
+    }
+
+    .warning-box p {
+        font-size: 17px;
+        margin-bottom: 24px;
+    }
+
+    .continue-button {
+        min-width: 160px;
+        padding: 13px 28px;
+        font-size: 16px;
+    }
+
+    .envelope-button {
+        width: min(88vw, 360px);
+        height: 225px;
+    }
+
+    .envelope-button.opening .envelope-letter {
+        transform: translateY(-115px);
+    }
+
+    .letter {
+        min-height: 480px;
+        padding: 45px 22px;
+    }
+
+    .letter h1 {
+        font-size: 43px;
+    }
+
+    .letter p {
+        font-size: 13px;
+    }
+
+    .letter-message {
+        font-size: 15px;
+    }
+
+    .question-box {
+        padding: 30px 18px;
+    }
+
+    .question-box h2 {
+        font-size: 36px;
+    }
+
+    .my-picture {
+        width: 110px;
+        height: 125px;
+    }
+
+    button {
+        padding: 11px 23px;
+    }
+
+    .game-content {
+        padding: 25px 15px;
+    }
+
+    .game-content h1 {
+        font-size: 38px;
+    }
+
+    .game-intro {
+        font-size: 15px;
+    }
+
+    .people-options {
+        gap: 12px;
+    }
+
+    .person-card {
+        padding: 8px;
+    }
+
+    .person-card img {
+        height: 155px;
+    }
+
+    .person-name {
+        font-size: 14px;
+    }
+
+    .choose-text {
+        font-size: 10px;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- FLOATING DECORATIONS -->
+
+<div class="background-hearts" id="hearts"></div>
+
+<!-- FIRST SCREEN: CLICK THE LOVE LETTER ENVELOPE -->
+
+<div class="envelope-screen" id="envelopeScreen">
+
+    <h1 class="envelope-heading">A little letter for you ♡</h1>
+
+    <button class="envelope-button" id="envelopeButton" type="button"
+        onclick="openEnvelope()" aria-label="Open the love letter">
+
+        <div class="envelope-back"></div>
+
+        <div class="envelope-letter">
+            <span>TO SOMEONE SPECIAL</span>
+            With Love ♡
+            <span>PLEASE OPEN ME</span>
+        </div>
+
+        <div class="envelope-front"></div>
+        <div class="envelope-flap"></div>
+        <div class="envelope-seal">♡</div>
+
+    </button>
+
+    <p class="envelope-hint">Click the envelope to open your letter</p>
+
+</div>
+
+<!-- WARNING SCREEN -->
+
+<div class="warning-screen" id="warningScreen">
+
+    <div class="warning-box">
+
+        <div class="warning-icon">⚠️</div>
+
+        <h1>Warning!!!!</h1>
+
+        <p>
+            To read my letter for you, you must play a simple game first,
+            Choose the Correct Answer to continue
+        </p>
+
+        <button class="continue-button" type="button"
+            onclick="continueToLetter()">
+            Continue
+        </button>
+
+    </div>
+
+</div>
+
+<!-- VINTAGE LOVE LETTER -->
+
+<div class="letter" id="letter">
+
+    <div class="top-decoration">♡ ✿ ♡</div>
+
+    <h1>A Little Love Letter</h1>
+
+    <div class="letter-divider">♡ ❀ ♡</div>
+
+    <div class="signature">
+        With Love, ♡
+    </div>
+
+    <div class="bottom-decoration">
+        ✿ ♡ ✿
+    </div>
+
+</div>
+
+<!-- FIRST QUESTION CARD -->
+
+<div class="question-box" id="questionBox">
+
+    <div class="question-heart">💗</div>
+
+    <img
+        src="C:\Users\andre\Downloads\Electronic Card\1870d1cb-9f3c-4e93-9e6a-71cf27c26f83.jpg"
+        alt="My picture"
+        class="my-picture"
+    >
+
+    <h2>Am I handsome?</h2>
+
+    <p>Choose your answer carefully! hehe ♡</p>
+
+    <div class="buttons">
+
+        <button id="yesBtn" onclick="sayYes()">
+            YES ♡
+        </button>
+
+        <button id="noBtn" onclick="moveNo()">
+            NO
+        </button>
+
+    </div>
+
+    <div class="card-footer">
+        ♡ ✿ ♡
+    </div>
+
+</div>
+
+<!-- SECOND PAGE: GAME -->
+
+<div class="next-page" id="nextPage">
+
+    <div class="game-content">
+
+        <p class="game-intro">
+            Before you continue, play this game!
+        </p>
+
+        <h1>Who is more handsome?</h1>
+
+        <p class="game-instruction">
+            Choose your answer carefully! ♡
+        </p>
+
+        <div class="people-options">
+
+            <!-- JOSHUA GARCIA -->
+
+            <button
+                class="person-card"
+                id="joshuaCard"
+                type="button"
+                onclick="moveJoshua()">
+
+                <img
+                    src="https://s.yimg.com/os/en/the_hive_asia_947/c5780e217b98bc9df3a43c56c1d61c3a"
+                    alt="Joshua Garcia">
+
+                <span class="person-name">
+                    Joshua Garcia
+                </span>
+
+                <span class="choose-text">
+                    Choose Joshua
+                </span>
+
+            </button>
+
+            <!-- YOUR PICTURE -->
+
+            <button
+                class="person-card"
+                id="congCard"
+                type="button"
+                onclick="chooseCong()">
+
+                <img
+                    src="C:\Users\andre\Downloads\Electronic Card\1870d1cb-9f3c-4e93-9e6a-71cf27c26f83.jpg"
+                    alt="My picture">
+
+                <span class="person-name">
+                    Jose
+                </span>
+
+                <span class="choose-text">
+                    Jose
+                </span>
+
+            </button>
+
+        </div>
+
+        <p class="game-status" id="gameStatus">
+            Tap a picture to choose!
+        </p>
+
+    </div>
+
+</div>
+
+<!-- THIRD PAGE -->
+
+<div class="result-page" id="resultPage">
+
+    <!-- SECOND QUESTION -->
+
+    <div class="result-content" id="secondQuestion">
+
+        <div class="big-heart">🥰</div>
+
+        <h1>One More Question!</h1>
+
+        <p>
+            You chose Jose! But wait...
+            <br><br>
+            Who is more handsome?
+        </p>
+
+        <div class="people-options">
+
+            <!-- YOUR PICTURE -->
+
+            <button class="person-card" id="myFinalCard" type="button"
+                onclick="finalChoice('me')">
+
+                <img
+                    src="C:\Users\andre\Downloads\Electronic Card\1870d1cb-9f3c-4e93-9e6a-71cf27c26f83.jpg"
+                    alt="My picture">
+
+                <span class="person-name">Jose</span>
+
+                <span class="choose-text">Choose Me ♡</span>
+
+            </button>
+
+            <!-- PIOLO PASCUAL -->
+
+            <button class="person-card" id="pioloCard" type="button"
+                onclick="dodgePiolo()">
+
+                <img
+                    src="C:\Users\andre\Downloads\Electronic Card\pioloimage.jpg"
+                    alt="Piolo Pascual">
+
+                <span class="person-name">Piolo Pascual</span>
+
+                <span class="choose-text">Choose Piolo ♡</span>
+
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- GRADE QUESTION -->
+
+    <div class="result-content" id="gradeQuestion" style="display:none;">
+
+        <div class="big-heart">📝</div>
+
+        <h1>One Last Question!</h1>
+
+        <p>What grade will you give me?</p>
+
+        <div class="grade-options">
+
+            <button class="grade-button" type="button"
+                onclick="chooseGrade('1')">1</button>
+
+            <button class="grade-button" type="button"
+                onclick="chooseGrade('5')">5</button>
+
+            <button class="grade-button" type="button"
+                onclick="chooseGrade('2')">2</button>
+
+            <button class="grade-button" type="button"
+                onclick="chooseGrade('1.75')">1.75</button>
+
+        </div>
+
+        <p id="gradeStatus" class="grade-status" aria-live="polite">
+            Choose your grade! You can continue only if you choose 1. 😉
+        </p>
+
+    </div>
+
+    <!-- FINAL ANSWER -->
+
+    <div class="result-content" id="finalAnswer" style="display:none;">
+
+        <div class="big-heart" id="finalEmoji">💗</div>
+
+        <h1 id="finalTitle">Thank You!</h1>
+
+        <p id="finalMessage"></p>
+
+        <p style="margin-top: 20px;">♡ ✿ ♡</p>
+
+        <!-- NEW: CONTINUE BUTTON -->
+        <button class="continue-button" type="button" style="margin-top: 20px;"
+            onclick="goToCongrats()">
+            Continue
+        </button>
+
+    </div>
+
+    <!-- CONGRATULATIONS PAGE -->
+
+    <div class="result-content" id="congratsPage" style="display:none;">
+
+        <div class="big-heart">🎉</div>
+
+        <h1>Congratulation !!!!</h1>
+
+        <p>Nobody deserves this more than you do.</p>
+
+        <button class="continue-button" type="button" style="margin-top: 25px;"
+            onclick="goToLoveLetter()">
+            Continue
+        </button>
+
+    </div>
+
+</div>
+
+<!-- FINAL LOVE LETTER PAGE -->
+
+<div class="love-letter-page" id="loveLetterPage">
+
+    <div class="letter" style="display:block;">
+
+        <div class="top-decoration">♡ ✿ ♡</div>
+
+        <h1>My Letter</h1>
+
+        <div class="letter-divider">♡ ❀ ♡</div>
+
+        <!-- PUT YOUR MESSAGE HERE -->
+        <p class="letter-message">
+            Hello Ma'am, I am not good at english but i will try to message you in english, btw i am jose andrei abesamis the dark big man
+            idk if you know me. First of all i would like to thank you for kindess as a teacher and i saw your kindess not just for us your 
+            students, but to everyone, i really like you as person because you look like a perfect example of how a human should be.
+        </p>
+        <p>
+            When i first saw you i already know that ahhhh this teacher is kinda masungit and madiwara, you look like you have a bad aura
+            but everytime we meet eh nagagandahan na ako sa inyo, your smile is like the smile of gehlee hahaha, do you know gehlee? if no you should 
+            watch pbb rn promise kikiligin ka ma'am.
+        </p>
+        <p>
+            I learned lot things of you in html, CSS, javascript and the special lesson i learned from you is how to be a good human you taught us how to be a ethical person, and i would like to say sorry because sometimes eh nagagalit kayo samin i have already forgotten the reason why you are angry with us hahaha but i will still say soryy ma'am 
+        </p>
+        <p>
+            I know we dont really know each other but i will not forget you and i promise everytime we meet
+            i will greet you, That all ma'am arigatou gozamaisu
+        </p>
+
+        <div class="signature">With Love, Jose ♡</div>
+
+        <div class="bottom-decoration">✿ ♡ ✿</div>
+
+    </div>
+
+</div>
+
+<script>
+
+// FLOATING HEARTS
+
+const heartsContainer = document.getElementById("hearts");
+
+const heartSymbols = ["♡", "♥", "💕", "✿", "♡"];
+
+for (let i = 0; i < 25; i++) {
+
+    const heart = document.createElement("div");
+
+    heart.className = "floating-heart";
+
+    heart.innerHTML = heartSymbols[
+        Math.floor(Math.random() * heartSymbols.length)
+    ];
+
+    heart.style.left = Math.random() * 100 + "%";
+    heart.style.fontSize = (15 + Math.random() * 25) + "px";
+    heart.style.animationDuration = (6 + Math.random() * 10) + "s";
+    heart.style.animationDelay = Math.random() * 10 + "s";
+
+    heartsContainer.appendChild(heart);
+
+}
+
+
+// OPEN THE ENVELOPE
+
+function openEnvelope() {
+
+    const screen =
+        document.getElementById("envelopeScreen");
+
+    const envelope =
+        document.getElementById("envelopeButton");
+
+    if (envelope.classList.contains("opening")) return;
+
+    envelope.classList.add("opening");
+
+    screen.classList.add("opened");
+
+    setTimeout(() => {
+
+        screen.style.display = "none";
+
+        document.getElementById("warningScreen").style.display = "flex";
+
+    }, 900);
+
+}
+
+
+// CONTINUE FROM THE WARNING TO THE LETTER PAGE
+
+function continueToLetter() {
+
+    document.getElementById("warningScreen").style.display = "none";
+
+    document.getElementById("letter").style.display = "block";
+
+    document.getElementById("questionBox").style.display = "block";
+
+}
+
+
+// NO BUTTON MOVEMENT ON FIRST PAGE
+
+function moveNo() {
+
+    const btn = document.getElementById("noBtn");
+
+    btn.style.position = "fixed";
+
+    const maxX = window.innerWidth - btn.offsetWidth - 20;
+    const maxY = window.innerHeight - btn.offsetHeight - 20;
+
+    const randomX = 10 + Math.random() * Math.max(0, maxX - 10);
+    const randomY = 10 + Math.random() * Math.max(0, maxY - 10);
+
+    btn.style.left = randomX + "px";
+    btn.style.top = randomY + "px";
+
+}
+
+
+// YES BUTTON: OPEN THE GAME PAGE
+
+function sayYes() {
+
+    document.getElementById("letter").style.display = "none";
+
+    document.getElementById("questionBox").style.display = "none";
+
+    document.getElementById("nextPage").style.display = "flex";
+
+}
+
+
+// JOSHUA GARCIA: MOVE TO A RANDOM LOCATION
+
+function moveJoshua() {
+
+    const btn = document.getElementById("joshuaCard");
+    const cong = document.getElementById("congCard");
+
+    const rect = btn.getBoundingClientRect();
+
+    const congRect = cong.getBoundingClientRect();
+
+    btn.classList.add("running");
+
+    btn.style.width = rect.width + "px";
+    btn.style.height = rect.height + "px";
+    btn.style.left = rect.left + "px";
+    btn.style.top = rect.top + "px";
+
+    const maxX = window.innerWidth - rect.width - 15;
+    const maxY = window.innerHeight - rect.height - 15;
+
+    let randomX;
+    let randomY;
+    let attempts = 0;
+    let overlapsCong;
+
+    do {
+
+        randomX = 10 + Math.random() * Math.max(0, maxX - 10);
+        randomY = 10 + Math.random() * Math.max(0, maxY - 10);
+
+        overlapsCong =
+            randomX < congRect.right &&
+            randomX + rect.width > congRect.left &&
+            randomY < congRect.bottom &&
+            randomY + rect.height > congRect.top;
+
+        attempts++;
+
+    } while (overlapsCong && attempts < 40);
+
+    btn.style.left = randomX + "px";
+    btn.style.top = randomY + "px";
+
+    document.getElementById("gameStatus").textContent =
+        "Oops! Joshua moved! Try choosing again! 😂";
+
+}
+
+
+// YOUR PICTURE: OPEN THE THIRD PAGE
+
+function chooseCong() {
+
+    document.getElementById("nextPage").style.display = "none";
+
+    document.getElementById("resultPage").style.display = "flex";
+
+}
+
+
+// PIOLO'S CARD MOVES WHEN CLICKED
+
+function dodgePiolo() {
+
+    const card = document.getElementById("pioloCard");
+    const myCard = document.getElementById("myFinalCard");
+
+    const rect = card.getBoundingClientRect();
+
+    card.classList.add("running");
+
+    card.style.width = rect.width + "px";
+    card.style.left = rect.left + "px";
+    card.style.top = rect.top + "px";
+
+    const myRect = myCard.getBoundingClientRect();
+
+    const margin = 12;
+
+    const maxX = Math.max(margin, window.innerWidth - rect.width - margin);
+    const maxY = Math.max(margin, window.innerHeight - rect.height - margin);
+
+    let randomX = margin;
+    let randomY = margin;
+    let overlapsMyCard = true;
+    let attempts = 0;
+
+    while (overlapsMyCard && attempts < 100) {
+
+        randomX = margin + Math.random() * Math.max(0, maxX - margin);
+        randomY = margin + Math.random() * Math.max(0, maxY - margin);
+
+        overlapsMyCard =
+            randomX < myRect.right &&
+            randomX + rect.width > myRect.left &&
+            randomY < myRect.bottom &&
+            randomY + rect.height > myRect.top;
+
+        attempts++;
+
+    }
+
+    card.style.left = randomX + "px";
+    card.style.top = randomY + "px";
+
+}
+
+
+// CLICK YOUR PICTURE TO CONTINUE
+
+function finalChoice(choice) {
+
+    if (choice !== "me") return;
+
+    document.getElementById("secondQuestion").style.display = "none";
+
+    document.getElementById("gradeQuestion").style.display = "block";
+
+}
+
+
+// ONLY GRADE 1 UNLOCKS THE FINAL PAGE
+
+function chooseGrade(grade) {
+
+    const status = document.getElementById("gradeStatus");
+
+    if (grade !== "1") {
+
+        status.textContent =
+            "Wrong answer! 😂 Try again. The correct grade is 1!";
+
+        return;
+
+    }
+
+    document.getElementById("gradeQuestion").style.display = "none";
+
+    document.getElementById("finalAnswer").style.display = "block";
+
+    document.getElementById("finalEmoji").textContent = "🥰";
+
+    document.getElementById("finalTitle").textContent =
+        "Awww! You gave me a 1!";
+
+    document.getElementById("finalMessage").innerHTML =
+        "You really know the correct answer! 😂" +
+        "<br><br>Thank you for choosing JOse and giving me a grade of 1! ♡";
+
+}
+
+
+// FINAL PAGE -> CONGRATULATIONS
+
+function goToCongrats() {
+
+    document.getElementById("finalAnswer").style.display = "none";
+
+    document.getElementById("congratsPage").style.display = "block";
+
+}
+
+
+// CONGRATULATIONS -> LOVE LETTER
+
+function goToLoveLetter() {
+
+    document.getElementById("resultPage").style.display = "none";
+
+    document.getElementById("loveLetterPage").style.display = "flex";
+
+}
+
+</script>
+
+</body>
+</html>
